@@ -1,0 +1,4 @@
+# src/config.py
+CITY = "Karachi"
+AQICN_API_TOKEN = "3f25effb642ee4af6c77afbf339f3dad9b6d11e6"
+HOPSWORKS_API_KEY = "4ve1PmwDuqiLhE1Y.hb5tc2xYWaELWh6m80JFmoDtt7onsgdjrfHHV9w1U2kQ11ZUhQ7MLMW4TN1CHCQL"
