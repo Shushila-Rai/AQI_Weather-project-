@@ -2,10 +2,14 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
-import hopsworks
 import plotly.express as px
 import plotly.graph_objects as go
 from src.config import CITY
+try:
+    import hopsworks
+    HOPSWORKS_AVAILABLE = True
+except ImportError:
+    HOPSWORKS_AVAILABLE = False
 
 
 st.set_page_config(
