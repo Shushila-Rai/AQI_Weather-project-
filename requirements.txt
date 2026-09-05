@@ -7,5 +7,4 @@ joblib
 streamlit
 python-dotenv
 pyarrow
-hopsworks[python]
 plotly
