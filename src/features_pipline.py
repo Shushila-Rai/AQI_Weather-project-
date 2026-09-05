@@ -1,53 +1,42 @@
+import os
+import hopsworks
 import pandas as pd
 import datetime
 import requests
-import hopsworks
-from config import CITY, AQICN_API_TOKEN, HOPSWORKS_API_KEY
+from config import CITY, AQICN_API_TOKEN
+from config import CITY, AQICN_API_TOKEN
 
 def fetch_and_save_features():
-    # 1. Fetch data from AQICN API
+    HOPSWORKS_API_KEY = "4ve1PmwDuqiLhE1Y.hb5tc2xYWaELWh6m80JFmoDtt7onsgdjrfHHV9w1U2kQ11ZUhQ7MLMW4TN1CHCQL"
     url = f"https://api.waqi.info/feed/{CITY}/?token={AQICN_API_TOKEN}"
+    
     response = requests.get(url)
     data = response.json()
     
     if data['status'] == 'ok':
+        now = datetime.datetime.now()
         aqi = data['data']['aqi']
         
-        # Current timestamp and time-based features
-        now = datetime.datetime.now()
-        
-        # Create a dataframe for the features
-        feature_data = pd.DataFrame([{
-            "city": CITY,
-            "datetime": str(now),
-            "hour": now.hour,
-            "day": now.day,
-            "month": now.month,
-            "aqi": aqi
+        df = pd.DataFrame([{
+            'city': CITY,
+            'datetime': now,
+            'hour': now.hour,
+            'day': now.day,
+            'month': now.month,
+            'aqi': aqi
         }])
         
-        print("Features generated successfully:")
-        print(feature_data)
-        
-        # 2. Connect to Hopsworks Feature Store
-        project = hopsworks.login(api_key_value=HOPSWORKS_API_KEY)
+        project = hopsworks.login(api_key_value="4ve1PmwDuqiLhE1Y.hb5tc2xYWaELWh6m80JFmoDtt7onsgdjrfHHV9w1U2kQ11ZUhQ7MLMW4TN1CHCQL")
         fs = project.get_feature_store()
         
-        # 3. Create or get Feature Group
-        aqi_feature_group = fs.get_or_create_feature_group(
-            name="aqi_features",
+        fg = fs.get_or_create_feature_group(
+            name="aqi_weather_fg",
             version=1,
             primary_key=["city", "datetime"],
-            description="Air Quality Index dataset with time features",
-            online_enabled=True
+            description="AQI and Weather feature group"
         )
-        
-        # 4. Insert data into Feature Store
-        aqi_feature_group.insert(feature_data, write_options={"wait_for_job": False})
+        fg.insert(df)
         print("Data successfully stored in Hopsworks Feature Store!")
-        
-    else:
-        print("Failed to fetch data from API.")
 
 if __name__ == "__main__":
     fetch_and_save_features()
